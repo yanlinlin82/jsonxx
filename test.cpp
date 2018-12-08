@@ -79,6 +79,13 @@ void test_array_and_object()
 
 	Json j1(Json().Append("key", 123));
 	std::cout << __FUNCTION__ << ": j1 = " << j1 << std::endl;
+
+	Json j2("abc");
+	j2.Append("x", 123);
+	std::cout << __FUNCTION__ << ": j2 = " << j2 << std::endl;
+
+	j2.Append("y", Json());
+	std::cout << __FUNCTION__ << ": j2 = " << j2 << std::endl;
 }
 
 int main()

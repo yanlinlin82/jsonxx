@@ -27,18 +27,21 @@ public:
 
 	template <typename T> Json& operator = (T v) { *this = Json(v); return *this; }
 
+	void Clear() { type_ = JSON_NULL; s_.clear(); a_.clear(); m_.clear(); }
+
 	Json& Append(const Json& x) {
 		assert(a_.size() == m_.size());
-		std::string name = "V" + std::to_string(a_.size() + 1);
-		if (m_.find(name) != m_.end()) {
-			for (size_t i = 1; ; ++i) {
-				std::string key = name + "." + std::to_string(i);
-				if (m_.find(key) == m_.end()) {
-					name = key;
-					break;
-				}
-			}
+		if (this == &x) {
+			Json copy(x);
+			return Append(copy);
 		}
+		if (type_ == JSON_BOOL || type_ == JSON_NUMBER || type_ == JSON_STRING) {
+			auto name = GenerateNewName();
+			Json copy(*this);
+			a_.push_back(name);
+			m_[name] = copy;
+		}
+		auto name = GenerateNewName();
 		a_.push_back(name);
 		m_[name] = x;
 		type_ = JSON_ARRAY;
@@ -46,6 +49,17 @@ public:
 	}
 	Json& Append(const std::string& name, const Json& x) {
 		assert(a_.size() == m_.size());
+		if (this == &x) {
+			auto n = name;
+			Json copy(x);
+			return Append(n, x);
+		}
+		if (type_ == JSON_BOOL || type_ == JSON_NUMBER || type_ == JSON_STRING) {
+			auto name = GenerateNewName();
+			Json copy(*this);
+			a_.push_back(name);
+			m_[name] = copy;
+		}
 		a_.push_back(name);
 		m_[name] = x;
 		type_ = JSON_OBJECT;
@@ -81,6 +95,20 @@ public:
 			break;
 		}
 		return s;
+	}
+private:
+	std::string GenerateNewName() const {
+		std::string name = std::to_string(a_.size() + 1);
+		if (m_.find(name) != m_.end()) {
+			for (size_t i = 1; ; ++i) {
+				std::string key = name + "." + std::to_string(i);
+				if (m_.find(key) == m_.end()) {
+					name = key;
+					break;
+				}
+			}
+		}
+		return name;
 	}
 
 private:
