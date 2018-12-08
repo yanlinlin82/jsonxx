@@ -22,7 +22,7 @@ public:
 	Json(float v): type_(JSON_NUMBER), s_(std::to_string(v)) { }
 	Json(double v): type_(JSON_NUMBER), s_(std::to_string(v)) { }
 	Json(long double v): type_(JSON_NUMBER), s_(std::to_string(v)) { }
-	Json(std::string&& v): type_(JSON_STRING), s_(v) { }
+	Json(const std::string& v): type_(JSON_STRING), s_(v) { }
 	Json(const char* v): type_(JSON_STRING), s_(v) { }
 
 	template <typename T> Json& operator = (T v) { *this = Json(v); return *this; }
@@ -66,6 +66,39 @@ public:
 		return *this;
 	}
 public:
+	Json& operator [] (size_t index) {
+		if (type_ != JSON_ARRAY) { Clear(); }
+		if (index < a_.size()) { a_.resize(index + 1); }
+		return m_[a_[index]];
+	}
+	const Json& operator [] (size_t index) const {
+		if (type_ == JSON_ARRAY && index < a_.size()) {
+			auto it = m_.find(a_[index]);
+			assert(it != m_.end());
+			return it->second;
+		}
+		return nullJson_;
+	}
+
+	Json& operator [] (const std::string& name) {
+		if (type_ != JSON_OBJECT) { Clear(); }
+		auto it = m_.find(name);
+		if (it == m_.end()) {
+			m_.insert(std::make_pair(name, Json()));
+			it = m_.find(name);
+		}
+		return it->second;
+	}
+	const Json& operator [] (const std::string& name) const {
+		if (type_ == JSON_ARRAY) {
+			auto it = m_.find(name);
+			if (it != m_.end()) {
+				return it->second;
+			}
+		}
+		return nullJson_;
+	}
+
 	std::string ToString() const {
 		std::string s;
 		switch (type_) {
@@ -113,9 +146,12 @@ private:
 
 private:
 	Type type_ = JSON_NULL;
+
 	std::string s_;
 	std::vector<std::string> a_;
 	std::map<std::string, Json> m_;
+
+	const static Json nullJson_;
 };
 
 inline std::ostream& operator << (std::ostream& os, const Json& j) { return (os << j.ToString()); }

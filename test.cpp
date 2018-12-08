@@ -86,6 +86,21 @@ void test_array_and_object()
 
 	j2.Append("y", Json());
 	std::cout << __func__ << ": j2 = " << j2 << std::endl;
+
+	std::cout << __func__ << ": j2[\"1\"] = " << j2["1"] << std::endl;
+	std::cout << __func__ << ": j2[\"x\"] = " << j2["x"] << std::endl;
+	std::cout << __func__ << ": j2[\"y\"] = " << j2["y"] << std::endl;
+
+	Json j3("abc");
+	j3.Append(123);
+	std::cout << __func__ << ": j3 = " << j3 << std::endl;
+
+	j3.Append(Json());
+	std::cout << __func__ << ": j3 = " << j3 << std::endl;
+
+	std::cout << __func__ << ": j3[0] = " << j3[0] << std::endl;
+	std::cout << __func__ << ": j3[1] = " << j3[1] << std::endl;
+	std::cout << __func__ << ": j3[2] = " << j3[2] << std::endl;
 }
 
 int main()
