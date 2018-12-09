@@ -88,6 +88,9 @@ public:
 		return nullJson_;
 	}
 
+	Json& operator += (const Json& x) { return Append(x); }
+	Json& operator += (const std::pair<std::string, Json>& p) { return Append(p.first, p.second); }
+
 	std::string ToString() const {
 		std::string s;
 		switch (type_) {

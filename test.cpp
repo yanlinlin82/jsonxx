@@ -101,6 +101,16 @@ void test_array_and_object()
 	std::cout << __func__ << ": j3[0] = " << j3[0] << std::endl;
 	std::cout << __func__ << ": j3[1] = " << j3[1] << std::endl;
 	std::cout << __func__ << ": j3[2] = " << j3[2] << std::endl;
+
+	Json j4;
+	j4 += 123;
+	j4 += 45;
+	std::cout << __func__ << ": j4 = " << j4 << std::endl;
+
+	Json j5;
+	j5 += std::make_pair("key", 123);
+	j5 += std::make_pair("second", Json().Append("a").Append("b"));
+	std::cout << __func__ << ": j5 = " << j5 << std::endl;
 }
 
 int main()
