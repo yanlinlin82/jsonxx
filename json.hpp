@@ -7,7 +7,7 @@
 
 class Json
 {
-private:
+public:
 	enum Type { JSON_NULL, JSON_BOOL, JSON_NUMBER, JSON_STRING, JSON_ARRAY, JSON_OBJECT };
 
 public:
@@ -26,52 +26,53 @@ public:
 	Json(const std::string& v): type_(JSON_STRING), text_(v) { }
 	Json(const char* v)       : type_(JSON_STRING), text_(v) { }
 
-	template <typename T> Json& operator = (T v) { Set(v); return *this; }
-private:
-	void Set(bool v)               { Clear(JSON_BOOL,   (v ? TEXT_TRUE : "")); }
-	void Set(int v)                { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(long v)               { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(long long v)          { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned v)           { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned long v)      { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned long long v) { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(float v)              { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(double v)             { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(long double v)        { Clear(JSON_NUMBER, std::to_string(v)); }
-	void Set(const std::string& v) { Clear(JSON_STRING, v); }
-	void Set(const char* v)        { Clear(JSON_STRING, v); }
-
-	void Clear(Type t, const std::string s = "") {
-		if (type_ != t) { type_ = t; array_.clear(); object_.clear(); }
-		text_ = s;
-	}
 public:
-	void Clear() { Clear(JSON_NULL); }
+	template <typename T> Json& operator = (T v) { Set(v); return *this; }
 
+	void Set(bool v)               { Set(JSON_BOOL,   (v ? TEXT_TRUE : "")); }
+	void Set(int v)                { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(long v)               { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(long long v)          { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned v)           { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned long v)      { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned long long v) { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(float v)              { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(double v)             { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(long double v)        { Set(JSON_NUMBER, std::to_string(v)); }
+	void Set(const std::string& v) { Set(JSON_STRING, v); }
+	void Set(const char* v)        { Set(JSON_STRING, v); }
+
+	void Set(Type type = JSON_NULL, const std::string s = "") {
+		type_ = type;
+		text_ = s;
+		array_.clear();
+		object_.clear();
+	}
+
+public:
 	Json& Append(const Json& x) {
 		if (this == &x) {
 			Json copy(x);
 			return Append(copy);
 		}
-		if (type_ != JSON_ARRAY) { Clear(); type_ = JSON_ARRAY; }
+		if (type_ != JSON_ARRAY) { Set(JSON_ARRAY); }
 		array_.push_back(x);
 		type_ = JSON_ARRAY;
 		return *this;
 	}
 	Json& Append(const std::string& name, const Json& x) {
 		if (this == &x) {
-			auto n = name;
 			Json copy(x);
-			return Append(n, x);
+			return Append(name, copy);
 		}
-		if (type_ != JSON_OBJECT) { Clear(); type_ = JSON_OBJECT; }
+		if (type_ != JSON_OBJECT) { Set(JSON_OBJECT); }
 		if (object_.find(name) == object_.end()) { array_.push_back(Json(name)); }
 		object_[name] = x;
 		return *this;
 	}
 public:
 	Json& operator [] (size_t index) {
-		if (type_ != JSON_ARRAY) { Clear(); type_ = JSON_ARRAY; }
+		if (type_ != JSON_ARRAY) { Set(JSON_ARRAY); }
 		if (index >= array_.size()) { array_.resize(index + 1); }
 		return array_[index];
 	}
@@ -83,7 +84,7 @@ public:
 	}
 
 	Json& operator [] (const std::string& name) {
-		if (type_ != JSON_OBJECT) { Clear(); type_ = JSON_OBJECT; }
+		if (type_ != JSON_OBJECT) { Set(JSON_OBJECT); }
 		auto it = object_.find(name);
 		if (it == object_.end()) {
 			array_.push_back(name);
@@ -102,9 +103,11 @@ public:
 		return nullJson_;
 	}
 
+public:
 	Json& operator += (const Json& x) { return Append(x); }
 	Json& operator += (const std::pair<std::string, Json>& p) { return Append(p.first, p.second); }
 
+public:
 	std::string ToString() const {
 		std::string s;
 		switch (type_) {
