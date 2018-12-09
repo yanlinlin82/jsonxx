@@ -27,6 +27,11 @@ public:
 	Json(const char* v)       : type_(JSON_STRING), text_(v) { }
 
 public:
+	bool AsBool() const { return !text_.empty(); }
+	std::string AsString() const { return text_; }
+	template <typename T> T AsNumber() const { T v; std::istringstream ss(text_); ss >> v; return v; }
+
+public:
 	template <typename T> Json& operator = (T v) { Set(v); return *this; }
 
 	void Set(bool v)               { Set(JSON_BOOL,   (v ? TEXT_TRUE : "")); }
