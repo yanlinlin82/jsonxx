@@ -10,30 +10,43 @@ class Json
 private:
 	enum Type { JSON_NULL, JSON_BOOL, JSON_NUMBER, JSON_STRING, JSON_ARRAY, JSON_OBJECT };
 
-	static constexpr const char* TEXT_NULL = "null";
-	static constexpr const char* TEXT_TRUE = "true";
-	static constexpr const char* TEXT_FALSE = "false";
-	static constexpr const char* TEXT_ZERO = "0";
-
 public:
 	Json(): type_(JSON_NULL) { }
 
-	Json(bool v): type_(JSON_BOOL), text_(v ? TEXT_TRUE : "") { }
-	Json(int v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long long v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(unsigned v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(unsigned long v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(bool v)              : type_(JSON_BOOL),   text_(v ? TEXT_TRUE : "") { }
+	Json(int v)               : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(long v)              : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(long long v)         : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(unsigned v)          : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(unsigned long v)     : type_(JSON_NUMBER), text_(std::to_string(v)) { }
 	Json(unsigned long long v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(float v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(double v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long double v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(float v)             : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(double v)            : type_(JSON_NUMBER), text_(std::to_string(v)) { }
+	Json(long double v)       : type_(JSON_NUMBER), text_(std::to_string(v)) { }
 	Json(const std::string& v): type_(JSON_STRING), text_(v) { }
-	Json(const char* v): type_(JSON_STRING), text_(v) { }
+	Json(const char* v)       : type_(JSON_STRING), text_(v) { }
 
-	template <typename T> Json& operator = (T v) { *this = Json(v); return *this; }
+	template <typename T> Json& operator = (T v) { Set(v); return *this; }
+private:
+	void Set(bool v)               { Clear(JSON_BOOL,   (v ? TEXT_TRUE : "")); }
+	void Set(int v)                { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(long v)               { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(long long v)          { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned v)           { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned long v)      { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(unsigned long long v) { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(float v)              { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(double v)             { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(long double v)        { Clear(JSON_NUMBER, std::to_string(v)); }
+	void Set(const std::string& v) { Clear(JSON_STRING, v); }
+	void Set(const char* v)        { Clear(JSON_STRING, v); }
 
-	void Clear() { type_ = JSON_NULL; text_.clear(); array_.clear(); object_.clear(); }
+	void Clear(Type t, const std::string s = "") {
+		if (type_ != t) { type_ = t; array_.clear(); object_.clear(); }
+		text_ = s;
+	}
+public:
+	void Clear() { Clear(JSON_NULL); }
 
 	Json& Append(const Json& x) {
 		if (this == &x) {
@@ -59,7 +72,7 @@ public:
 public:
 	Json& operator [] (size_t index) {
 		if (type_ != JSON_ARRAY) { Clear(); type_ = JSON_ARRAY; }
-		if (index < array_.size()) { array_.resize(index + 1); }
+		if (index >= array_.size()) { array_.resize(index + 1); }
 		return array_[index];
 	}
 	const Json& operator [] (size_t index) const {
@@ -73,6 +86,7 @@ public:
 		if (type_ != JSON_OBJECT) { Clear(); type_ = JSON_OBJECT; }
 		auto it = object_.find(name);
 		if (it == object_.end()) {
+			array_.push_back(name);
 			object_.insert(std::make_pair(name, Json()));
 			it = object_.find(name);
 		}
@@ -140,6 +154,11 @@ private:
 	std::map<std::string, Json> object_;
 
 	static const Json nullJson_;
-};
 
-inline std::ostream& operator << (std::ostream& os, const Json& j) { return (os << j.ToString()); }
+	static constexpr const char* TEXT_NULL = "null";
+	static constexpr const char* TEXT_TRUE = "true";
+	static constexpr const char* TEXT_FALSE = "false";
+	static constexpr const char* TEXT_ZERO = "0";
+
+	friend inline std::ostream& operator << (std::ostream& os, const Json& j) { return (os << j.ToString()); }
+};

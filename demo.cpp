@@ -115,6 +115,12 @@ void test_array_and_object()
 
 int main()
 {
+	Json j;
+	j["x"] = 123;
+	j["y"] = "hello";
+	j["z"][2] = true;
+	std::cout << j << std::endl;
+
 	test_constructors();
 	test_assignments();
 	test_array_and_object();
