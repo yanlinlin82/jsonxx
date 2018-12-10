@@ -154,6 +154,11 @@ public:
 		return s;
 	}
 
+public:
+	bool Parse(const std::string& s) {
+		return false;
+	}
+
 private:
 	Type type_ = JSON_NULL;
 
