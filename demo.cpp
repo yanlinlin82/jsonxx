@@ -58,10 +58,19 @@ void test_array_and_object()
 	j6["z"][2] = true; // j6 = {"x":123,"y":"hello","z":[null,null,true]}
 }
 
+void test_parser()
+{
+	Json j;
+	j.Parse("null");  // j = null
+	j.Parse("false"); // j = false
+	j.Parse("true");  // j = true
+}
+
 int main()
 {
 	test_constructors();
 	test_assignments();
 	test_array_and_object();
+	test_parser();
 	return 0;
 }

@@ -155,8 +155,17 @@ public:
 	}
 
 public:
-	bool Parse(const std::string& s) {
-		return false;
+	bool Parse(std::string_view s) {
+		if (s == "null") {
+			Set(JSON_NULL);
+		} else if (s == "false") {
+			Set(false);
+		} else if (s == "true") {
+			Set(true);
+		} else {
+			return false;
+		}
+		return true;
 	}
 
 private:
