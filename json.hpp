@@ -1,3 +1,8 @@
+#pragma once
+#if __cplusplus < 201703L
+#error C++17 is required!
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -5,182 +10,173 @@
 #include <map>
 #include <cassert>
 
-class Json
+namespace yll
 {
-public:
-	enum Type { JSON_NULL, JSON_BOOL, JSON_NUMBER, JSON_STRING, JSON_ARRAY, JSON_OBJECT };
+	class json
+	{
+	public:
+		enum class type { null, boolean, number, string, array, object };
 
-public:
-	Json(): type_(JSON_NULL) { }
+		static inline const std::string text_null = "null";
+		static inline const std::string text_true = "true";
+		static inline const std::string text_false = "false";
+	public:
+		json() = default;
+		template <class T> json(T v) { set(v); }
+		json(const std::initializer_list<std::string>& s):
+			type_(type::array), array_(s.begin(), s.end()) { }
+		json(std::string name, const json& v):
+			type_(type::object), array_{name}, object_{std::make_pair(name, v)} { }
+	public:
+		bool to_boolean() const { return !text_.empty(); }
+		template <typename T = int>
+		T to_number() const { T v; std::istringstream ss(text_); ss >> v; return v; }
 
-	Json(bool v)              : type_(JSON_BOOL),   text_(v ? TEXT_TRUE : "") { }
-	Json(int v)               : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long v)              : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long long v)         : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(unsigned v)          : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(unsigned long v)     : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(unsigned long long v): type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(float v)             : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(double v)            : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(long double v)       : type_(JSON_NUMBER), text_(std::to_string(v)) { }
-	Json(const std::string& v): type_(JSON_STRING), text_(v) { }
-	Json(const char* v)       : type_(JSON_STRING), text_(v) { }
+	public:
+		template <typename T> json&
+		operator = (T v) { set(v); return *this; }
 
-public:
-	bool AsBool() const { return !text_.empty(); }
-	std::string AsString() const { return text_; }
-	template <typename T> T AsNumber() const { T v; std::istringstream ss(text_); ss >> v; return v; }
-
-public:
-	template <typename T> Json& operator = (T v) { Set(v); return *this; }
-
-	void Set(bool v)               { Set(JSON_BOOL,   (v ? TEXT_TRUE : "")); }
-	void Set(int v)                { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(long v)               { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(long long v)          { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned v)           { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned long v)      { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(unsigned long long v) { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(float v)              { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(double v)             { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(long double v)        { Set(JSON_NUMBER, std::to_string(v)); }
-	void Set(const std::string& v) { Set(JSON_STRING, v); }
-	void Set(const char* v)        { Set(JSON_STRING, v); }
-
-	void Set(Type type = JSON_NULL, const std::string s = "") {
-		type_ = type;
-		text_ = s;
-		array_.clear();
-		object_.clear();
-	}
-
-public:
-	Json& Append(const Json& x) {
-		if (this == &x) {
-			Json copy(x);
-			return Append(copy);
+		template <class T>
+		void set(T v) { set_(type::number, std::to_string(v)); }
+		void set(bool v) { set_(type::boolean, (v ? text_true : "")); }
+		void set(const char* v) { set_(type::string, v); }
+		void set(const std::string& v) { set_(type::string, v); }
+		void set(const json& j) {
+			type_ = j.type_;
+			array_ = j.array_;
+			object_ = j.object_;
 		}
-		if (type_ != JSON_ARRAY) { Set(JSON_ARRAY); }
-		array_.push_back(x);
-		type_ = JSON_ARRAY;
-		return *this;
-	}
-	Json& Append(const std::string& name, const Json& x) {
-		if (this == &x) {
-			Json copy(x);
-			return Append(name, copy);
+	private:
+		void set_(type t, const std::string s = "") {
+			type_ = t;
+			text_ = s;
+			array_.clear();
+			object_.clear();
 		}
-		if (type_ != JSON_OBJECT) { Set(JSON_OBJECT); }
-		if (object_.find(name) == object_.end()) { array_.push_back(Json(name)); }
-		object_[name] = x;
-		return *this;
-	}
-public:
-	Json& operator [] (size_t index) {
-		if (type_ != JSON_ARRAY) { Set(JSON_ARRAY); }
-		if (index >= array_.size()) { array_.resize(index + 1); }
-		return array_[index];
-	}
-	const Json& operator [] (size_t index) const {
-		if (type_ == JSON_ARRAY && index < array_.size()) {
+
+	public:
+		json& append(const json& x) {
+			if (this == &x) {
+				json copy(x);
+				return append(copy);
+			}
+			if (type_ != type::array) { set_(type::array); }
+			array_.push_back(x);
+			type_ = type::array;
+			return *this;
+		}
+		json& append(const std::string& name, const json& x) {
+			if (this == &x) {
+				json copy(x);
+				return append(name, copy);
+			}
+			if (type_ != type::object) { set_(type::object); }
+			if (object_.find(name) == object_.end()) { array_.push_back(json(name)); }
+			object_[name] = x;
+			return *this;
+		}
+	public:
+		json& operator [] (size_t index) {
+			if (type_ != type::array) { set_(type::array); }
+			if (index >= array_.size()) { array_.resize(index + 1); }
 			return array_[index];
 		}
-		return nullJson_;
-	}
-
-	Json& operator [] (const std::string& name) {
-		if (type_ != JSON_OBJECT) { Set(JSON_OBJECT); }
-		auto it = object_.find(name);
-		if (it == object_.end()) {
-			array_.push_back(name);
-			object_.insert(std::make_pair(name, Json()));
-			it = object_.find(name);
+		const json& operator [] (size_t index) const {
+			if (type_ == type::array && index < array_.size()) {
+				return array_[index];
+			}
+			return nullJson_;
 		}
-		return it->second;
-	}
-	const Json& operator [] (const std::string& name) const {
-		if (type_ == JSON_OBJECT) {
+
+		json& operator [] (const std::string& name) {
+			if (type_ != type::object) { set_(type::object); }
 			auto it = object_.find(name);
-			if (it != object_.end()) {
-				return it->second;
+			if (it == object_.end()) {
+				array_.push_back(name);
+				object_.insert(std::make_pair(name, json()));
+				it = object_.find(name);
 			}
+			return it->second;
 		}
-		return nullJson_;
-	}
-
-public:
-	Json& operator += (const Json& x) { return Append(x); }
-	Json& operator += (const std::pair<std::string, Json>& p) { return Append(p.first, p.second); }
-
-public:
-	std::string ToString() const {
-		std::string s;
-		switch (type_) {
-		default: assert(false); // should never reach here
-		case JSON_NULL:
-			s = TEXT_NULL;
-			break;
-		case JSON_BOOL:
-			s = (text_.empty() ? TEXT_FALSE : TEXT_TRUE);
-			break;
-		case JSON_NUMBER:
-			s = (text_.empty() ? TEXT_ZERO : text_);
-			break;
-		case JSON_STRING:
-			s = "\"" + text_ + "\"";
-			break;
-		case JSON_ARRAY:
-			s = "[";
-			for (size_t i = 0; i < array_.size(); ++i) {
-				if (i > 0) { s += ","; }
-				s += array_[i].ToString();
-			}
-			s += "]";
-			break;
-		case JSON_OBJECT:
-			s = "{";
-			assert(array_.size() == object_.size());
-			for (size_t i = 0; i < array_.size(); ++i) {
-				if (i > 0) { s += ","; }
-				const auto name = array_[i].text_;
+		const json& operator [] (const std::string& name) const {
+			if (type_ == type::object) {
 				auto it = object_.find(name);
-				assert(it != object_.end());
-				const auto e = it->second;
-				s += "\"" + name + "\":" + e.ToString();
+				if (it != object_.end()) {
+					return it->second;
+				}
 			}
-			s += "}";
-			break;
+			return nullJson_;
 		}
-		return s;
-	}
 
-public:
-	bool Parse(std::string_view s) {
-		if (s == "null") {
-			Set(JSON_NULL);
-		} else if (s == "false") {
-			Set(false);
-		} else if (s == "true") {
-			Set(true);
-		} else {
-			return false;
+	public:
+		json& operator += (const json& x) { return append(x); }
+
+	public:
+		std::string to_string() const {
+			std::string s;
+			switch (type_) {
+			default: assert(false); // should never reach here
+			case type::null:
+				s = text_null;
+				break;
+			case type::boolean:
+				s = (text_.empty() ? text_false : text_true);
+				break;
+			case type::number:
+				s = text_;
+				break;
+			case type::string:
+				s = "\"" + text_ + "\"";
+				break;
+			case type::array:
+				s = "[";
+				for (size_t i = 0; i < array_.size(); ++i) {
+					if (i > 0) { s += ","; }
+					s += array_[i].to_string();
+				}
+				s += "]";
+				break;
+			case type::object:
+				s = "{";
+				assert(array_.size() == object_.size());
+				for (size_t i = 0; i < array_.size(); ++i) {
+					if (i > 0) { s += ","; }
+					const auto name = array_[i].text_;
+					auto it = object_.find(name);
+					assert(it != object_.end());
+					const auto e = it->second;
+					s += "\"" + name + "\":" + e.to_string();
+				}
+				s += "}";
+				break;
+			}
+			return s;
 		}
-		return true;
-	}
 
-private:
-	Type type_ = JSON_NULL;
+	public:
+		bool parse(std::string_view s) {
+			if (s == "null") {
+				set_(type::null);
+			} else if (s == "false") {
+				set(false);
+			} else if (s == "true") {
+				set(true);
+			} else {
+				return false;
+			}
+			return true;
+		}
 
-	std::string text_;
-	std::vector<Json> array_;
-	std::map<std::string, Json> object_;
+	private:
+		type type_ = type::null;
 
-	static const Json nullJson_;
+		std::string text_;
+		std::vector<json> array_;
+		std::map<std::string, json> object_;
 
-	static constexpr const char* TEXT_NULL = "null";
-	static constexpr const char* TEXT_TRUE = "true";
-	static constexpr const char* TEXT_FALSE = "false";
-	static constexpr const char* TEXT_ZERO = "0";
+		static const json nullJson_;
 
-	friend inline std::ostream& operator << (std::ostream& os, const Json& j) { return (os << j.ToString()); }
-};
+		friend inline std::ostream&
+		operator << (std::ostream& os, const json& j) { return (os << j.to_string()); }
+	};
+}
