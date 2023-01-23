@@ -16,15 +16,43 @@ namespace yll
 	{
 	public:
 		enum class type { null, boolean, number, string, array, object };
-
+	public:
 		static inline const std::string text_null = "null";
 		static inline const std::string text_true = "true";
 		static inline const std::string text_false = "false";
+	private:
+		type type_ = type::null;
+		std::string text_;
+		std::vector<json> array_;
+		std::map<std::string, json> object_;
 	public:
+		// copy control
+		~json() = default;
+		json(const json&) = default;
+		json& operator = (const json&) = default;
+	public:
+		// null json
 		json() = default;
-		template <class T> json(T v) { set(v); }
-		json(const std::initializer_list<std::string>& s):
+		// boolean json
+		json(bool v): type_(type::boolean), text_(v ? text_true : "") { }
+		// number json
+		json(int v): type_(type::number), text_(std::to_string(v)) { }
+		json(long v): type_(type::number), text_(std::to_string(v)) { }
+		json(long long v): type_(type::number), text_(std::to_string(v)) { }
+		json(unsigned v): type_(type::number), text_(std::to_string(v)) { }
+		json(unsigned long v): type_(type::number), text_(std::to_string(v)) { }
+		json(unsigned long long v): type_(type::number), text_(std::to_string(v)) { }
+		json(float v): type_(type::number), text_(trim0(std::to_string(v))) { }
+		json(double v): type_(type::number), text_(trim0(std::to_string(v))) { }
+		json(long double v): type_(type::number), text_(std::to_string(v)) { }
+		// string json
+		json(const char* s): type_(type::string), text_(s) { }
+		json(const std::string& s): type_(type::string), text_(s) { }
+		// array json
+		template <typename T>
+		json(const std::initializer_list<T>& s):
 			type_(type::array), array_(s.begin(), s.end()) { }
+		// object json
 		json(std::string name, const json& v):
 			type_(type::object), array_{name}, object_{std::make_pair(name, v)} { }
 	public:
@@ -34,18 +62,10 @@ namespace yll
 
 	public:
 		template <typename T> json&
-		operator = (T v) { set(v); return *this; }
+		operator = (T v) { return operator = (json(v)); }
 
-		template <class T>
-		void set(T v) { set_(type::number, std::to_string(v)); }
-		void set(bool v) { set_(type::boolean, (v ? text_true : "")); }
-		void set(const char* v) { set_(type::string, v); }
-		void set(const std::string& v) { set_(type::string, v); }
-		void set(const json& j) {
-			type_ = j.type_;
-			array_ = j.array_;
-			object_ = j.object_;
-		}
+		template <typename T>
+		void set(T v) { operator = (json(v)); }
 	private:
 		void set_(type t, const std::string s = "") {
 			type_ = t;
@@ -85,7 +105,7 @@ namespace yll
 			if (type_ == type::array && index < array_.size()) {
 				return array_[index];
 			}
-			return nullJson_;
+			return null_;
 		}
 
 		json& operator [] (const std::string& name) {
@@ -105,7 +125,7 @@ namespace yll
 					return it->second;
 				}
 			}
-			return nullJson_;
+			return null_;
 		}
 
 	public:
@@ -168,15 +188,17 @@ namespace yll
 		}
 
 	private:
-		type type_ = type::null;
-
-		std::string text_;
-		std::vector<json> array_;
-		std::map<std::string, json> object_;
-
-		static const json nullJson_;
+		static const json null_;
 
 		friend inline std::ostream&
 		operator << (std::ostream& os, const json& j) { return (os << j.to_string()); }
+
+		static std::string trim0(std::string s) {
+			if (s.find('.') != std::string::npos) {
+				s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+				s.erase(s.find_last_not_of('.') + 1, std::string::npos);
+			}
+			return s;
+		}
 	};
 }

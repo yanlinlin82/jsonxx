@@ -11,12 +11,15 @@ void test_constructors()
 	json j4(123);                 // j4 = 123
 	json j5(-45);                 // j5 = -45
 	json j6(1234567890123LL);     // j6 = 1234567890123
-	json j7(0.1f);                // j7 = 0.100000
-	json j8(3.14159);             // j8 = 3.141590
+	json j7(0.1f);                // j7 = 0.1
+	json j8(3.14159);             // j8 = 3.14159
 	json j9("abc");               // j9 = "abc"
 	json j10(std::string("xyz")); // j10 = "xyz"
 
 	json j11({"a", "b"});         // j11 = ["a","b"]
+	json j12({123, 456, 78, 90}); // j12 = [123,456,78,90]
+	json j13({"123", "xyz"});     // j13 = ["123","xyz"]
+	json j14({1.23, 45.6, .78});  // j14 = [1.23,45.6,0.78]
 }
 
 void test_assignments()
@@ -28,8 +31,8 @@ void test_assignments()
 	json j4 = 123;                 // j4 = 123
 	json j5 = -45;                 // j5 = -45
 	json j6 = 1234567890123LL;     // j6 = 1234567890123
-	json j7 = 0.1f;                // j7 = 0.100000
-	json j8 = 3.14159;             // j8 = 3.141590
+	json j7 = 0.1f;                // j7 = 0.1
+	json j8 = 3.14159;             // j8 = 3.14159
 	json j9 = "abc";               // j9 = "abc"
 	json j10 = std::string("xyz"); // j10 = "xyz"
 }
