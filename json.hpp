@@ -83,11 +83,24 @@ namespace yll
 		}
 
 	public:
+		void swap(json& j) {
+			using std::swap;
+			swap(type_, j.type_);
+			swap(text_, j.text_);
+			swap(array_, j.array_);
+			swap(object_, j.object_);
+		}
 		template <typename T> json&
-		operator = (T v) { return operator = (json(v)); }
-
+		operator = (T v) & {
+			json j(v);
+			swap(j);
+			return *this;
+		}
 		template <typename T>
-		void set(T v) { operator = (json(v)); }
+		void set(T v) {
+			json j(v);
+			swap(j);
+		}
 	private:
 		void set_(type t, const std::string s = "") {
 			type_ = t;
