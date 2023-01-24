@@ -26,11 +26,6 @@ namespace yll
 		std::vector<json> array_;
 		std::map<std::string, json> object_;
 	public:
-		// copy control
-		~json() = default;
-		json(const json&) = default;
-		json& operator = (const json&) = default;
-	public:
 		// null json
 		json() = default;
 		// boolean json

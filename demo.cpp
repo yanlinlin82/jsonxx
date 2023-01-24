@@ -4,37 +4,74 @@ using yll::json;
 
 void test_constructors()
 {
-	json j0;                      // j0 = null
-	json j1(false);               // j1 = false
-	json j2(true);                // j2 = true
-	json j3(0);                   // j3 = 0
-	json j4(123);                 // j4 = 123
-	json j5(-45);                 // j5 = -45
-	json j6(1234567890123LL);     // j6 = 1234567890123
-	json j7(0.1f);                // j7 = 0.1
-	json j8(3.14159);             // j8 = 3.14159
-	json j9("abc");               // j9 = "abc"
-	json j10(std::string("xyz")); // j10 = "xyz"
+	// null json
+	json j0; // j0 = null
 
-	json j11({"a", "b"});         // j11 = ["a","b"]
-	json j12({123, 456, 78, 90}); // j12 = [123,456,78,90]
-	json j13({"123", "xyz"});     // j13 = ["123","xyz"]
-	json j14({1.23, 45.6, .78});  // j14 = [1.23,45.6,0.78]
+	// boolean json
+	json j1(false); // j1 = false
+	json j2(true);  // j2 = true
+
+	// number json
+	json j3(0);               // j3 = 0
+	json j4(123);             // j4 = 123
+	json j5(-45);             // j5 = -45
+	json j6(1234567890123LL); // j6 = 1234567890123
+	json j7(0.1f);            // j7 = 0.1
+	json j8(3.14159);         // j8 = 3.14159
+
+	// string json
+	json j9("C-style string");          // j9 = "C-style string"
+	json j10(std::string("C++ style")); // j10 = "C++ style"
+
+	// array json
+	json j21({"a", "b"});         // j21 = ["a","b"]
+	json j22({123, 456, 78, 90}); // j22 = [123,456,78,90]
+	json j23({"123", "xyz"});     // j23 = ["123","xyz"]
+	json j24({1.23, 45.6, .78});  // j24 = [1.23,45.6,0.78]
+
+	// object json
+	json j31("key", "value"); // j31 = {"key":"value"}
+	json j32("pi", 3.14159);  // j32 = {"pi":3.14159}
+
+	// more complex json
+	json j41("array", {1, 2, 3}); // j41 = {"array":[1,2,3]}
 }
 
 void test_assignments()
 {
-	json j0 = json();              // j0 = null
-	json j1 = false;               // j1 = false
-	json j2 = true;                // j2 = true
-	json j3 = 0;                   // j3 = 0
-	json j4 = 123;                 // j4 = 123
-	json j5 = -45;                 // j5 = -45
-	json j6 = 1234567890123LL;     // j6 = 1234567890123
-	json j7 = 0.1f;                // j7 = 0.1
-	json j8 = 3.14159;             // j8 = 3.14159
-	json j9 = "abc";               // j9 = "abc"
-	json j10 = std::string("xyz"); // j10 = "xyz"
+	json j;
+
+	// null json
+	j = json(); // j = null
+
+	// boolean json
+	j = false; // j = false
+	j = true;  // j = true
+
+	// number json
+	j = 0;               // j = 0
+	j = 123;             // j = 123
+	j = -45;             // j = -45
+	j = 1234567890123LL; // j = 1234567890123
+	j = 0.1f;            // j = 0.1
+	j = 3.14159;         // j = 3.14159
+
+	// string json
+	j = "C-style string";         // j = "C-style string"
+	j = std::string("C++ style"); // j = "C++ style"
+
+	// array json
+	j = {"a", "b"};         // j = ["a","b"]
+	j = {123, 456, 78, 90}; // j = [123,456,78,90]
+	j = {"123", "xyz"};     // j = ["123","xyz"]
+	j = {1.23, 45.6, .78};  // j = [1.23,45.6,0.78]
+
+	// object json
+	j = json("key", "value"); // j = {"key":"value"}
+	j = json("pi", 3.14159);  // j = {"pi":3.14159}
+
+	// more complex json
+	j = json("array", {1, 2, 3}); // j = {"array":[1,2,3]}
 }
 
 void test_array_and_object()

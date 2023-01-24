@@ -30,3 +30,20 @@ j["y"] = "hello";
 j["z"][2] = true;
 std::cout << j << std::endl; // output: {"x":123,"y":"hello","z":[null,null,true]}
 ```
+
+## Known Limitations
+
+* Float numbers are not precise enough, because they are converted and stored in string format.
+
+    ```cpp
+    std::cerr << json(1.23456789) << std::endl;
+    // output: 1.234568
+    ```
+
+* When using C++ syntax to construct, only the same type values are allowed to declare in an array.
+
+    ```cpp
+    json j1({123, 45});      // OK
+    json j2({"abc", "xyz"}); // OK
+    json j3({123, "xyz"});   // syntex error
+    ```
