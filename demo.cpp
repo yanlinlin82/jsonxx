@@ -100,13 +100,13 @@ void test_array_and_object()
 	j2.append("x", 123);    // j2 = {"x":123}
 	j2.append("y", json()); // j2 = {"x":123,"y":null}
 
-	json j3("abc");    // j3 = "abc"
-	j3.append(123);    // j3 = ["abc",123]
-	j3.append(json()); // j3 = ["abc",123]
+	json j3("abc");        // j3 = "abc"
+	j3.append(123);        // j3 = ["abc",123]
+	j3.append(json());     // j3 = ["abc",123]
 
-	json j4;   // j4 = null
-	j4 += 123; // j4 = 123
-	j4 += 45;  // j4 = [123,45]
+	json j4;        // j4 = null
+	j4.append(123); // j4 = 123
+	j4.append(45);  // j4 = [123,45]
 
 	json j5;                        // j5 = null
 	j5.append("key", 123);          // j5 = {"key":123}

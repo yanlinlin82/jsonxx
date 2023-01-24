@@ -177,9 +177,6 @@ namespace yll
 		}
 
 	public:
-		json& operator += (const json& x) { return append(x); }
-
-	public:
 		std::string to_string() const {
 			std::string s;
 			switch (type_) {
