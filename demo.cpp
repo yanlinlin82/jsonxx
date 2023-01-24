@@ -85,37 +85,37 @@ void test_assignments()
 	j = json("array", {1, 2, 3}); // j = {"array":[1,2,3]}
 }
 
-void test_array_and_object()
+void test_append()
 {
-	json j({"abc"});         // j = ["abc"]
-	j.append("def");         // j = ["abc","def"]
-	j.append({"uvw","xyz"}); // j = ["abc","def","uvw","xyz"]
-	j.append(123);           // j = ["abc","def","uvw","xyz",123]
-	j.append({3.14,-2.18});  // j = ["abc","def","uvw","xyz",123,3.14,-2.18]
+	json j1({"abc"});         // j1 = ["abc"]
+	j1.append("def");         // j1 = ["abc","def"]
+	j1.append({"uvw","xyz"}); // j1 = ["abc","def","uvw","xyz"]
+	j1.append(123);           // j1 = ["abc","def","uvw","xyz",123]
+	j1.append({3.14,-2.18});  // j1 = ["abc","def","uvw","xyz",123,3.14,-2.18]
 
-	json j1("key",123);      // j1 = {"key":123}
-	j1.append("foo","bar");  // j1 = {"key":123,"foo":"bar"}
+	json j2("key",123);      // j2 = {"key":123}
+	j2.append("foo","bar");  // j2 = {"key":123,"foo":"bar"}
 
-	json j2("abc");         // j2 = "abc"
-	j2.append("x", 123);    // j2 = {"x":123}
-	j2.append("y", json()); // j2 = {"x":123,"y":null}
+	json j3("abc");         // j3 = "abc"
+	j3.append("x", 123);    // j3 = {"x":123}
+	j3.append("y", json()); // j3 = {"x":123,"y":null}
 
-	json j3("abc");        // j3 = "abc"
-	j3.append(123);        // j3 = ["abc",123]
-	j3.append(json());     // j3 = ["abc",123]
+	json j4("abc");    // j4 = "abc"
+	j4.append(123);    // j4 = ["abc",123]
+	j4.append(json()); // j4 = ["abc",123]
 
-	json j4;        // j4 = null
-	j4.append(123); // j4 = 123
-	j4.append(45);  // j4 = [123,45]
+	json j5;        // j5 = null
+	j5.append(123); // j5 = 123
+	j5.append(45);  // j5 = [123,45]
 
-	json j5;                        // j5 = null
-	j5.append("key", 123);          // j5 = {"key":123}
-	j5.append("second", {"a","b"}); // j5 = {"key":123,"second":["a","b"]}
+	json j6;                        // j6 = null
+	j6.append("key", 123);          // j6 = {"key":123}
+	j6.append("second", {"a","b"}); // j6 = {"key":123,"second":["a","b"]}
 
-	json j6;           // j6 = null
-	j6["x"] = 123;     // j6 = {"x":123}
-	j6["y"] = "hello"; // j6 = {"x":123,"y":"hello"}
-	j6["z"][2] = true; // j6 = {"x":123,"y":"hello","z":[null,null,true]}
+	json j7;           // j7 = null
+	j7["x"] = 123;     // j7 = {"x":123}
+	j7["y"] = "hello"; // j7 = {"x":123,"y":"hello"}
+	j7["z"][2] = true; // j7 = {"x":123,"y":"hello","z":[null,null,true]}
 }
 
 void test_parser()
@@ -132,7 +132,7 @@ int main()
 	test_constructors();
 	test_json_node_values();
 	test_assignments();
-	test_array_and_object();
+	test_append();
 	test_parser();
 	return 0;
 }
