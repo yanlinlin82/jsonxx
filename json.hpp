@@ -235,9 +235,6 @@ namespace yll
 	private:
 		static const json null_;
 
-		friend inline std::ostream&
-		operator << (std::ostream& os, const json& j) { return (os << j.to_string()); }
-
 		static std::string trim0(std::string s) {
 			if (s.find('.') != std::string::npos) {
 				s.erase(s.find_last_not_of('0') + 1, std::string::npos);
@@ -246,4 +243,8 @@ namespace yll
 			return s;
 		}
 	};
+
+	inline std::ostream& operator << (std::ostream& os, const json& j) {
+		return (os << j.to_string());
+	}
 }
