@@ -90,17 +90,9 @@ namespace yll
 			swap(array_, j.array_);
 			swap(object_, j.object_);
 		}
-		template <typename T> json&
-		operator = (T v) & {
-			json j(v);
-			swap(j);
-			return *this;
-		}
+		json& operator = (json j) & { swap(j); return *this; }
 		template <typename T>
-		void set(T v) {
-			json j(v);
-			swap(j);
-		}
+		void set(T v) { json j(v); swap(j); }
 	private:
 		void set_(type t, const std::string s = "") {
 			type_ = t;
@@ -115,9 +107,30 @@ namespace yll
 				json copy(x);
 				return append(copy);
 			}
-			if (type_ != type::array) { set_(type::array); }
-			array_.push_back(x);
-			type_ = type::array;
+			if (x.type_ == type::null) return *this;
+			if (type_ == type::null) {
+				set(x);
+			} else if (type_ == type::array) {
+				if (x.type_ == type::array) {
+					array_.insert(array_.end(), x.array_.cbegin(), x.array_.cend());
+				} else {
+					array_.push_back(x);
+				}
+			} else if (type_ == type::object && x.type_ == type::object) {
+				for (auto c : x.object_) {
+					auto it = object_.find(c.first);
+					if (it == object_.end()) {
+						array_.push_back(json(c.first));
+					}
+					object_.insert(c);
+				}
+			} else {
+				json ret;
+				ret.type_ = type::array;
+				ret.array_.push_back(*this);
+				ret.array_.push_back(x);
+				set(ret);
+			}
 			return *this;
 		}
 		json& append(const std::string& name, const json& x) {

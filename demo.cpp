@@ -87,20 +87,25 @@ void test_assignments()
 
 void test_array_and_object()
 {
-	json j0(json().append("abc"));      // j0 = ["abc"]
+	json j({"abc"});         // j = ["abc"]
+	j.append("def");         // j = ["abc","def"]
+	j.append({"uvw","xyz"}); // j = ["abc","def","uvw","xyz"]
+	j.append(123);           // j = ["abc","def","uvw","xyz",123]
+	j.append({3.14,-2.18});  // j = ["abc","def","uvw","xyz",123,3.14,-2.18]
 
-	json j1(json().append("key", 123)); // j1 = {"key":123}
+	json j1("key",123);      // j1 = {"key":123}
+	j1.append("foo","bar");  // j1 = {"key":123,"foo":"bar"}
 
 	json j2("abc");         // j2 = "abc"
 	j2.append("x", 123);    // j2 = {"x":123}
 	j2.append("y", json()); // j2 = {"x":123,"y":null}
 
 	json j3("abc");    // j3 = "abc"
-	j3.append(123);    // j3 = [123]
-	j3.append(json()); // j3 = [123,null]
+	j3.append(123);    // j3 = ["abc",123]
+	j3.append(json()); // j3 = ["abc",123]
 
 	json j4;   // j4 = null
-	j4 += 123; // j4 = [123]
+	j4 += 123; // j4 = 123
 	j4 += 45;  // j4 = [123,45]
 
 	json j5;                        // j5 = null
