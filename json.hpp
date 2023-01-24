@@ -51,9 +51,36 @@ namespace yll
 		json(std::string name, const json& v):
 			type_(type::object), array_{name}, object_{std::make_pair(name, v)} { }
 	public:
-		bool to_boolean() const { return !text_.empty(); }
+		bool as_boolean() const {
+			assert(type_ == type::boolean);
+			return !text_.empty();
+		}
 		template <typename T = int>
-		T to_number() const { T v; std::istringstream ss(text_); ss >> v; return v; }
+		T as_number() const {
+			assert(type_ == type::number);
+			std::istringstream ss(text_);
+			T v;
+			ss >> v;
+			return v;
+		}
+		std::string as_string() const {
+			assert(type_ == type::string);
+			return text_;
+		}
+		std::vector<json> as_array() const {
+			assert(type_ == type::array);
+			return array_;
+		}
+		std::vector<std::pair<std::string, json>> as_object() const {
+			assert(type_ == type::object);
+			std::vector<std::pair<std::string, json>> ret;
+			for (auto c : array_) {
+				auto it = object_.find(c.text_);
+				assert(it != object_.end());
+				ret.push_back(*it);
+			}
+			return ret;
+		}
 
 	public:
 		template <typename T> json&

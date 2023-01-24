@@ -37,6 +37,17 @@ void test_constructors()
 	json j41("array", {1, 2, 3}); // j41 = {"array":[1,2,3]}
 }
 
+void test_json_node_values()
+{
+	json j1(true);  // j1.as_boolean() = 1
+	json j2(false); // j2.as_boolean() = 0
+
+	json j3(123);  // j3.as_number() = 123
+	json j4(3.14); // j4.as_number<float>() = 3.14
+
+	json j5("hello"); // j5.as_string() = hello
+}
+
 void test_assignments()
 {
 	json j;
@@ -112,7 +123,9 @@ void test_parser()
 
 int main()
 {
+	std::cout << std::unitbuf; // set no buffer for stdout
 	test_constructors();
+	test_json_node_values();
 	test_assignments();
 	test_array_and_object();
 	test_parser();

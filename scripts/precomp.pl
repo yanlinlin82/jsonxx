@@ -8,7 +8,7 @@ open my $fh, "<", $ARGV[0] or die;
 my $line_no = 0;
 while (my $line = <$fh>) {
 	++$line_no;
-	if ($line =~ /^(.*)\/\/\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/) {
+	if ($line =~ /^(.*)\/\/\s*([A-Za-z_].*?)\s*=\s*(.*?)\s*$/) {
 		my ($code, $var, $exp) = ($1, $2, $3);
 		$exp =~ s/"/\\"/g;
 		print $code, "std::cout << \"[TEST:$line_no] $var = \" << $var << \" // expected: $exp\" << std::endl;\n";
