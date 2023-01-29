@@ -22,6 +22,7 @@ void test_constructors()
 	// string json
 	json j9("C-style string");          // j9 = "C-style string"
 	json j10(std::string("C++ style")); // j10 = "C++ style"
+	json j11("string with \'quote\'");  // j11 = "string with \'quote\'"
 
 	// array json
 	json j21({"a", "b"});         // j21 = ["a","b"]
@@ -124,6 +125,14 @@ void test_parser()
 	j.parse("null");  // j = null
 	j.parse("false"); // j = false
 	j.parse("true");  // j = true
+
+	j.parse("123");   // j = 123
+	j.parse("3.14");  // j = 3.14
+	j.parse("-.618"); // j = -.618
+
+	j.parse("\"\""); // j = ""
+	j.parse("[]"); // j = []
+	j.parse("{}"); // j = {}
 }
 
 int main()
